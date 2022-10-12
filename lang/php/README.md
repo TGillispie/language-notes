@@ -6,8 +6,8 @@ This documentation describes a set of guidelines and a variety of resources for 
   - [scoop.sh (windows)](#scoop-sh)
 - [Setup w/ Apache (scoop)](#setup-apache)
 - [Setup Support](#setup-support)
-
-
+	-	[PHP ini File Support](#php-ini-support)
+		- [Environment Path](#environment-path-has-php)
 ## Install
 ### scoop.sh
 ``` scoop install php ```
@@ -15,10 +15,19 @@ This documentation describes a set of guidelines and a variety of resources for 
 
 ## Setup Apache
 
-
 ## Setup Support
+
+### PHP ini Support
+
+#### Environment Path has PHP
+When running php under Apache, the path variable must have the PHP path.  This should be in the same enviornment where Apache is running.
+
 #### List php information.
 ``` php -i ```
 
 #### Show which php INI is in memory.
-```  ```
+```  php --ini ```
+
+#### List Cli Modules
+``` php -m ```
+
