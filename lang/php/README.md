@@ -143,13 +143,13 @@ scoop install oracle-instant-client-odbc # Not certain this is required.
 
 #### Oracle PHP Ini
 ```
-# enable the required extension.  Apache restart might be necessary.
-extension=oci8_19  # enable for oci_connect functions.  (preferred)
+# enable the preffered extension.  Apache restart might be necessary.
+extension=oci8_19  # enable for oci_connect functions.
 extension=pdo_oci   # enable for PDO with OCI drivers.
 ```
 
 
-### PDO
+### PDO (Core PHP)
 
 #### Apache Crashes When using PDO.
 Pulled from SO.  This apache config addition increases memory stack to help solve the error message listed below.
