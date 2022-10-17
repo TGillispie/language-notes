@@ -8,6 +8,16 @@ This documentation describes a set of guidelines and a variety of resources for 
 - [Setup Support](#setup-support)
 	-	[PHP ini File Support](#php-ini-support)
 		- [Environment Path](#environment-path-has-php)
+    - [PHP Info](#list-php-information)
+    - [Show loaded PHP ini](#show-which-php-ini-is-in-memory)
+    - [List CLI Modules](#list-cli-modules)
+- [LDAP](#ldap)
+  - [PHP Extension](#php-extension)
+  - [Create Default Paths](#create-default-paths)
+  - [Example Config](#example-ldapconf)
+  - [Get LDAP Cert](#get-ldap-cert)
+  - [PHP LDAP Troubleshooting](#php-ldap-troubleshooting)
+
 ## Install
 ### scoop.sh
 ``` scoop install php ```
@@ -20,7 +30,7 @@ This documentation describes a set of guidelines and a variety of resources for 
 ### PHP ini Support
 
 #### Environment Path has PHP
-When running php under Apache, the path variable must have the PHP path.  This should be in the same enviornment where Apache is running.
+When running php under Apache, the path variable must have the PHP path.  This should be in the same enviornment where Apache (httpd) is running.
 
 #### List php information.
 ``` php -i ```
@@ -31,3 +41,80 @@ When running php under Apache, the path variable must have the PHP path.  This s
 #### List Cli Modules
 ``` php -m ```
 
+
+## LDAP
+The most important part about setting up LDAP with PHP and Apache seems to be the  paths to the ldap.conf and LDAP certs.  PHP uses ldap.conf to locate certs and configure client communication.  Getting the certs can be easily done using the openssl command with the intended ldap server url.
+
+### PHP Extension
+Enable the php extension in PHP ini.
+``` extension=ldap ```
+
+### Create default paths.
+Create the default paths for open ldap.  Create a path for a client LDAP config and a path for the LDAP certificates.
+
+```
+# For Windows
+c:\openldap\sysconf\
+c:\openldap\sysconf\certs
+```
+
+### Example ldap.conf
+Create an Ldap config at: ```/c/openldap/sysconf/ldap.conf```
+
+```
+TLS_REQCERT demand
+# TLS_CIPHER_SUITE SHA
+# TLS_PROTOCOL_MIN 3.4
+TLS_CACERT C:\openldap\sysconf\certs\whitepages.noaa.gov.cert
+```
+
+### Get LDAP .cert
+Connect to the ldap server using openssl in order to get the ldap certs.  The cert should be placed in the configured ldap cert location listed above in the example config.
+
+```
+# Ref: Using openssl to get certificates.
+# https://ldapwiki.com/wiki/Obtain%20a%20Certificate%20from%20Server
+openssl s_client -showcerts -connect whitepages.noaa.gov:636 -servername whitepages.noaa.gov </dev/null 2>/dev/null > whitepages.noaa.gov.cert
+```
+
+### PHP LDAP Troubleshooting
+The following script was useful to debug and verify a proper setup for TLS and LDAP certs and config via PHP CLI & Web Server.
+
+```
+<?php
+// Debug script for PHP LDAP.
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+$user = '[username]';  // Without brackets, ex. first.last.
+$HARD_PASS = '[pass]';  // Hard code a password for web testing.
+$pass = $argv && $argv[1]
+  ? $argv[1]     // Wrap argugment in '' if using CLI: php test.php 'pa$$'.
+  : $HARD_PASS;
+
+$server = "ldaps://whitepages.noaa.gov";
+$dn = "uid=".strtolower($user).",ou=people,dc=noaa,dc=gov";
+
+ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 9);
+
+// Connect (Create Connection)
+$con = ldap_connect($server) or die(" -- Could not connect");
+$errno = ldap_errno($con);
+if ( $errno ) {
+  error_log(" -- LDAP - Connect error $errno  (".ldap_error($con).")");
+}
+
+// Use Connection.
+$bind = @ldap_bind($con, $dn, $pass);
+$errno = ldap_errno($con);
+if ( $errno ) {
+  error_log(" -- LDAP - Bind error $errno  (".ldap_error($con).")");
+}
+
+if ($bind)
+  echo ' -- ldap bind is a success!';
+else
+  echo ' -- ldap bind is not good.';
+
+```
