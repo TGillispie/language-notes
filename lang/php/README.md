@@ -17,6 +17,13 @@ This documentation describes a set of guidelines and a variety of resources for 
   - [Example Config](#example-ldapconf)
   - [Get LDAP Cert](#get-ldap-cert)
   - [PHP LDAP Troubleshooting](#php-ldap-troubleshooting)
+- [DB Connection](#db-connect)
+  - [Oracle](#oracle)
+    - [Download Client Library](#download-client-library)
+    - [Setup Extensions](#oracle-php-ini)
+ - [PDO](#db-pdo)
+    - [Apache Crashes](#apache-crashes-when-using-pdo)
+
 
 ## Install
 ### scoop.sh
@@ -117,4 +124,41 @@ if ($bind)
 else
   echo ' -- ldap bind is not good.';
 
+```
+
+
+## DB Connect
+### Oracle
+Download Oracle Instant Client and make sure paths for the application environment (shell) are configured properly.  Once those steps are done, enabling the php extension and provided a good connection string are the last steps.
+
+#### Download Client Library
+Install Oracle Instant Client via the preferred method.  Listed below is one example.
+
+```
+# Use the scoop Windows package manager to isntall Oracle Onstant Client.
+scoop install oracle-instant-client
+scoop install oracle-instant-client-sdk  # Not certain this is required.
+scoop install oracle-instant-client-odbc # Not certain this is required.
+```
+
+#### Oracle PHP Ini
+```
+# enable the required extension.  Apache restart might be necessary.
+extension=oci8_19  # enable for oci_connect functions.  (preferred)
+extension=pdo_oci   # enable for PDO with OCI drivers.
+```
+
+
+### PDO
+
+#### Apache Crashes When using PDO.
+Pulled from SO.  This apache config addition increases memory stack to help solve the error message listed below.
+
+##### Error Message
+AH00428: Parent: child process ```[pid]``` exited with status 3221225477 -- Restarting.
+
+```
+<IfModule mpm_winnt_module>
+    ThreadStackSize 8888888
+</IfModule>
 ```
