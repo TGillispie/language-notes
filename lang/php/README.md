@@ -3,7 +3,7 @@ This documentation describes a set of guidelines and a variety of resources for 
 ## Contents
 
 - [Install](#install)
-  - [scoop.sh (windows)](#scoop-sh)
+  - [scoop.sh (windows)](#install-w-scoop)
 - [Setup w/ Apache (scoop)](#setup-apache)
 - [Setup Support](#setup-support)
 	-	[PHP ini File Support](#php-ini-support)
@@ -21,12 +21,12 @@ This documentation describes a set of guidelines and a variety of resources for 
   - [Oracle](#oracle)
     - [Download Client Library](#download-client-library)
     - [Setup Extensions](#oracle-php-ini)
- - [PDO](#db-pdo)
-    - [Apache Crashes](#apache-crashes-when-using-pdo)
+  - [DB Errors](#db-errors)
+    - [Apache Crashes](#apache-crashes-w-pdo)
 
 
 ## Install
-### scoop.sh
+### Install w/ scoop
 ``` scoop install php ```
 
 
@@ -37,7 +37,7 @@ This documentation describes a set of guidelines and a variety of resources for 
 ### PHP ini Support
 
 #### Environment Path has PHP
-When running php under Apache, the path variable must have the PHP path.  This should be in the same enviornment where Apache (httpd) is running.
+When running php under Apache, the path variable must have the PHP path.  This should be in the same environment where Apache (httpd) is running.
 
 #### List php information.
 ``` php -i ```
@@ -97,7 +97,7 @@ error_reporting(E_ALL);
 $user = '[username]';  // Without brackets, ex. first.last.
 $HARD_PASS = '[pass]';  // Hard code a password for web testing.
 $pass = $argv && $argv[1]
-  ? $argv[1]     // Wrap argugment in '' if using CLI: php test.php 'pa$$'.
+  ? $argv[1]     // Wrap argument in '' if using CLI: php test.php 'pa$$'.
   : $HARD_PASS;
 
 $server = "ldaps://whitepages.noaa.gov";
@@ -129,13 +129,13 @@ else
 
 ## DB Connect
 ### Oracle
-Download Oracle Instant Client and make sure paths for the application environment (shell) are configured properly.  Once those steps are done, enabling the php extension and provided a good connection string are the last steps.
+Download Oracle Instant Client and make sure paths for the application environment (shell) are configured properly.  Once those steps are done, enabling the php extension and providing a good connection string are the last steps.
 
 #### Download Client Library
 Install Oracle Instant Client via the preferred method.  Listed below is one example.
 
 ```
-# Use the scoop Windows package manager to isntall Oracle Onstant Client.
+# Use the scoop Windows package manager to install Oracle Instant Client.
 scoop install oracle-instant-client
 scoop install oracle-instant-client-sdk  # Not certain this is required.
 scoop install oracle-instant-client-odbc # Not certain this is required.
@@ -143,19 +143,21 @@ scoop install oracle-instant-client-odbc # Not certain this is required.
 
 #### Oracle PHP Ini
 ```
-# enable the preffered extension.  Apache restart might be necessary.
+# Enable the preferred extension.  Apache restart might be necessary.
 extension=oci8_19  # enable for oci_connect functions.
 extension=pdo_oci   # enable for PDO with OCI drivers.
 ```
 
 
-### PDO (Core PHP)
-
-#### Apache Crashes When using PDO.
-Pulled from SO.  This apache config addition increases memory stack to help solve the error message listed below.
+### DB Errors
+#### Apache Crashes w/ PDO.
+Found on [Windows] this error occurs when apache exceeds its memory stack when working with PHP PDO.
 
 ##### Error Message
 AH00428: Parent: child process ```[pid]``` exited with status 3221225477 -- Restarting.
+
+##### Solution
+A solution found on Stack Overflow (SO) helps.  This apache config addition increases memory stack to help solve the error message listed above.
 
 ```
 <IfModule mpm_winnt_module>
