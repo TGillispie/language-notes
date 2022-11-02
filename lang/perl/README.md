@@ -38,7 +38,12 @@ Scoop does not install the apache perl module.  These steps provide a method for
 #### List installed perl modules.
 If modules are not found, or errors occur, look for the modules here first.
 
-``` instmodsh  # Enter l to list modules. ```
+``` 
+  cpan -l
+
+  # Another way to list modules.
+  instmodsh  # Enter l to list modules.
+```
 
 #### Diagnose suspect DLLS.
 Installing and Running depends.exe on a suspect DLL file can help diagnose errors like: dll reference not found, type issues.
